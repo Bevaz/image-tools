@@ -289,6 +289,10 @@ func unpackLayerEntry(dest string, header *tar.Header, reader io.Reader, entries
 				return false, err
 			}
 		}
+		err = os.Lchown(path, header.Uid, header.Gid)
+		if err != nil {
+			return false, err
+		}
 
 	case tar.TypeReg, tar.TypeRegA:
 		f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, info.Mode())
@@ -301,6 +305,10 @@ func unpackLayerEntry(dest string, header *tar.Header, reader io.Reader, entries
 			return false, errors.Wrap(err, "unable to copy")
 		}
 		f.Close()
+		err = os.Lchown(path, header.Uid, header.Gid)
+		if err != nil {
+			return false, err
+		}
 
 	case tar.TypeLink:
 		target := filepath.Join(dest, header.Linkname)
@@ -323,6 +331,11 @@ func unpackLayerEntry(dest string, header *tar.Header, reader io.Reader, entries
 		if err := os.Symlink(header.Linkname, path); err != nil {
 			return false, err
 		}
+		err = os.Lchown(path, header.Uid, header.Gid)
+		if err != nil {
+			return false, err
+		}
+
 	case tar.TypeXGlobalHeader:
 		return false, nil
 	}
