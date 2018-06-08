@@ -11,6 +11,7 @@ help:
 	@echo
 	@echo " * 'all' - Build the oci tool and manual pages"
 	@echo " * 'tool' - Build the oci tool"
+	@echo " * 'tool-static' - Build the static oci tool"
 	@echo " * 'install' - Install binaries and manual pages"
 	@echo " * 'install.tools' - Install tool needed for building this project"
 	@echo " * 'uninstall' - Remove the oci tool and manual pages"
@@ -29,6 +30,8 @@ check-license:
 tool:
 	go build -ldflags "-X main.gitCommit=${COMMIT}" -o oci-image-tool ./cmd/oci-image-tool
 
+tool-static:
+	CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static" -X main.gitCommit=${COMMIT}' -o oci-image-tool ./cmd/oci-image-tool
 
 all: tool man
 
